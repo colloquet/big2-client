@@ -62,7 +62,7 @@ class App extends React.Component {
 
   componentDidMount() {
     // this.socket = io.connect('http://localhost:8080')
-    this.socket = io.connect('https://dee.ireserve.me/')
+    this.socket = io.connect('https://dee.ireserve.me')
     this.socket.on('connect', this.init)
   }
 
