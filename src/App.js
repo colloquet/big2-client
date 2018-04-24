@@ -61,7 +61,8 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    this.socket = io.connect('http://192.168.1.203:9000')
+    // this.socket = io.connect('http://localhost:8080')
+    this.socket = io.connect('https://dee.ireserve.me/')
     this.socket.on('connect', this.init)
   }
 
@@ -238,7 +239,7 @@ class App extends React.Component {
     const opponentSide = side === 'A' ? 'B' : 'A'
     return (
       <Container>
-        {isConnected || <LoadingOverlay text="連線到伺服器中…" />}
+        {isConnected || <LoadingOverlay text="連線到伺服器中" />}
 
         <Spring
           from={{ scale: 0 }}
