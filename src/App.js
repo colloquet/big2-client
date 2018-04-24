@@ -1,5 +1,18 @@
-import React, { Component } from 'react'
+import React from 'react'
+import styled from 'styled-components'
 import io from 'socket.io-client'
+
+import Card from './components/Card'
+
+const Container = styled.div`
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1rem;
+`
+
+const CardsContainer = styled.div`
+  padding-left: 50px;
+`
 
 const INITIAL_STATE = {
   side: null,
@@ -8,14 +21,14 @@ const INITIAL_STATE = {
   chosenCards: [],
 }
 
-class App extends Component {
+class App extends React.Component {
   state = {
     isConnected: false,
     ...INITIAL_STATE,
   }
 
   componentDidMount() {
-    this.socket = io.connect('http://localhost:9000')
+    this.socket = io.connect('https://big2-server-mwjpnruize.now.sh')
     this.socket.on('connect', this.init)
   }
 
@@ -26,6 +39,7 @@ class App extends Component {
     })
     this.socket.on('player_left', playerId => {
       console.log(`${playerId} has left the room`)
+      this.leaveRoom()
     })
     this.socket.on('game_start', meta => {
       this.setState({ meta })
@@ -38,15 +52,15 @@ class App extends Component {
     })
     this.socket.on('game_finish', info => {
       alert(`player ${info.playerId} (side ${info.side}) has won the game!`)
-      this.resetGame()
+      this.leaveRoom()
+      this.resetGameState()
     })
   }
 
-  resetGame = () => {
+  resetGameState = () => {
     this.setState({
       ...INITIAL_STATE,
     })
-    this.leaveRoom()
   }
 
   chooseSide = side => {
@@ -93,15 +107,14 @@ class App extends Component {
 
   leaveRoom = () => {
     this.socket.emit('leave_room', () => {
-      console.log('successfully left room')
-      this.setState({ side: null, roomId: null })
+      this.resetGameState()
     })
   }
 
   render() {
     const { isConnected, side, roomId, meta, chosenCards } = this.state
     return (
-      <div>
+      <Container>
         {isConnected ? 'Connected' : 'Connecting...'}
         {side ? (
           <div>
@@ -118,41 +131,43 @@ class App extends Component {
                 {side === meta.turn && <strong>(it is your turn!)</strong>}
                 {meta.turnCount > 0 && (
                   <div>
-                    <ul>
-                      <li>
+                    <div>
+                      <p>
                         <strong>last played</strong>
-                      </li>
+                      </p>
                       {!!meta.lastPlayedCards.length ? (
-                        meta.lastPlayedCards.map(card => (
-                          <li key={`${card.number}-${card.suit}`}>
-                            {card.number} - {card.suit}
-                          </li>
-                        ))
+                        <CardsContainer>
+                          {meta.lastPlayedCards.map((card, index) => (
+                            <Card key={`${card.number}-${card.suit}`} card={card} index={index} />
+                          ))}
+                        </CardsContainer>
                       ) : (
-                        <li>pass!</li>
+                        <span>pass!</span>
                       )}
-                    </ul>
+                    </div>
                   </div>
                 )}
                 {Object.keys(meta.cards).map(key => {
                   const cardList = meta.cards[key]
                   const myCards = key === side
                   return (
-                    <ul key={key}>
-                      <li>
+                    <div key={key}>
+                      <p>
                         <strong>{key}</strong>
                         {myCards && <strong>(my cards)</strong>}
-                      </li>
-                      {cardList.map(card => (
-                        <li
-                          key={`${card.number}-${card.suit}`}
-                          onClick={() => this.chooseCard(card)}
-                          style={{ marginLeft: chosenCards.includes(card) ? '1rem' : 0 }}
-                        >
-                          {card.number} - {card.suit}
-                        </li>
-                      ))}
-                    </ul>
+                      </p>
+                      <CardsContainer>
+                        {cardList.map((card, index) => (
+                          <Card
+                            key={`${card.number}-${card.suit}`}
+                            card={card}
+                            onClick={this.chooseCard}
+                            isChosen={chosenCards.includes(card)}
+                            index={index}
+                          />
+                        ))}
+                      </CardsContainer>
+                    </div>
                   )
                 })}
                 {side === meta.turn && <button onClick={this.playPass}>pass</button>}
@@ -172,7 +187,7 @@ class App extends Component {
             <button onClick={() => this.chooseSide('B')}>B</button>
           </div>
         )}
-      </div>
+      </Container>
     )
   }
 }
