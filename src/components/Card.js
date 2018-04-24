@@ -11,9 +11,8 @@ const Container = styled.div`
   width: 80px;
   height: 120px;
   margin-left: -50px;
-  margin-bottom: 1rem;
   color: ${props => getColor(props.suit)};
-  cursor: pointer;
+  cursor: ${props => props.onClick ? 'pointer' : 'auto'};
 `
 
 const Meta = styled.div`
@@ -27,6 +26,13 @@ const Meta = styled.div`
 
 const Suit = styled.span`
   font-size: 0.8rem;
+`
+
+const Pass = styled.strong`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 `
 
 function getCardNumber(number) {
@@ -53,26 +59,39 @@ function getCardSuit(suit) {
 }
 
 function getColor(suit) {
-  return suit % 2 === 0 ? 'inherit' : 'red'
+  return suit % 2 === 0 ? 'inherit' : '#bd081c'
 }
 
-function Card({ card, onClick, isChosen, index }) {
+function Card({ card, onClick, isChosen, index, isPass }) {
   const chosenStyle = isChosen ? { transform: 'translateY(-1rem)' } : {}
   return (
     <Container
       suit={card.suit}
-      onClick={() => onClick(card)}
+      onClick={onClick ? () => onClick(card) : null}
       style={{
         zIndex: index,
         ...chosenStyle,
       }}
     >
-      <Meta>
-        <span>{getCardNumber(card.number)}</span>
-        <Suit>{getCardSuit(card.suit)}</Suit>
-      </Meta>
+      {isPass ? (
+        <Pass>PASS</Pass>
+      ) : (
+        <Meta>
+          <span>{getCardNumber(card.number)}</span>
+          <Suit>{getCardSuit(card.suit)}</Suit>
+        </Meta>
+      )}
     </Container>
   )
+}
+
+Card.defaultProps = {
+  card: {
+    suit: 0,
+  },
+  index: 1,
+  isChosen: false,
+  isPass: false,
 }
 
 export default Card
