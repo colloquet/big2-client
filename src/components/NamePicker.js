@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import store from 'store'
 
 import Button from './Button'
 
@@ -29,7 +30,7 @@ const Input = styled.input`
 
 class NamePicker extends React.Component {
   state = {
-    name: '',
+    name: store.get('name') || '',
   }
 
   onNameChange = (event) => {
@@ -47,6 +48,7 @@ class NamePicker extends React.Component {
       return
     }
 
+    store.set('name', this.state.name)
     this.props.onPick(this.state.name)
   }
 

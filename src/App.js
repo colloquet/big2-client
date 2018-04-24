@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import io from 'socket.io-client'
 import { Spring } from 'react-spring'
 
+import NotificationList from './components/NotificationList'
 import Spinner from './components/Spinner'
 import LoadingOverlay from './components/LoadingOverlay'
 import SidePicker from './components/SidePicker'
@@ -15,7 +16,7 @@ import Muted from './components/Muted'
 const Container = styled.div`
   max-width: 960px;
   margin: 0 auto;
-  padding: 1rem 1rem 3rem;
+  padding: 1rem 1rem 5rem;
 `
 
 const CardsContainer = styled.div`
@@ -37,64 +38,72 @@ const Modal = styled.div`
   z-index: 999;
 `
 
+const Info = Muted.extend`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.6rem;
+`
+
 const INITIAL_STATE = {
   side: null,
   roomId: null,
   meta: null,
   chosenCards: [],
-  pastTime: 0,
   won: false,
   gameFinished: false,
   rush: false,
 }
 
-const TIMEOUT = 30000
-
 function getRandomFromArray(array) {
   return array[Math.floor(Math.random() * array.length)]
 }
 
+let notificationId = 0
+
 class App extends React.Component {
   state = {
+    clientCount: 0,
     isConnected: false,
+    notificationList: [],
     ...INITIAL_STATE,
   }
 
   componentDidMount() {
-    // this.socket = io.connect('http://localhost:8080')
-    this.socket = io.connect('https://dee.ireserve.me')
+    if (process.env.NODE_ENV === 'production') {
+      this.socket = io.connect('https://dee.ireserve.me')
+    } else {
+      this.socket = io.connect('http://localhost:8080')
+    }
     this.socket.on('connect', this.init)
   }
 
   init = () => {
+    console.log('init')
     this.setState({ isConnected: true })
+    this.socket.on('disconnect', this.resetGameState)
+    this.socket.on('client_count', clientCount => {
+      this.setState({ clientCount })
+    })
     this.socket.on('player_joined', playerId => {
       console.log(`${playerId} has joined the room`)
     })
-    this.socket.on('player_left', playerId => {
-      alert('對方已離開房間')
+    this.socket.on('player_left', () => {
+      this.displayNotification('對方已離開房間')
       this.leaveRoom()
     })
     this.socket.on('game_start', meta => {
       this.setState({ meta })
-      if (meta.turn === this.state.side) {
-        this.startTimeout()
-      }
     })
     this.socket.on('game_update', meta => {
       this.setState({ meta })
-      if (meta.turn === this.state.side) {
-        this.startTimeout()
-      }
     })
     this.socket.on('game_error', message => {
-      alert(message)
+      this.displayNotification(message)
     })
     this.socket.on('game_finish', winner => {
       const won = this.state.side === winner.side
       this.setState({ won, gameFinished: true })
-      clearTimeout(this.timeout)
-      clearInterval(this.countdown)
     })
     this.socket.on('rush_player', () => {
       clearTimeout(this.rushTimeout)
@@ -107,26 +116,38 @@ class App extends React.Component {
     })
   }
 
-  startTimeout = () => {
-    this.timeout = setTimeout(() => {
-      const isPrevPass = !this.state.meta.lastPlayedCards.length
-      if (isPrevPass) {
-        this.playRandomCard()
-      } else {
-        this.playPass()
-      }
-    }, TIMEOUT)
-    this.countdown = setInterval(() => {
-      this.setState({ pastTime: this.state.pastTime + 1000 })
-    }, 1000)
+  addNotification = (item) => {
+    this.setState({
+      notificationList: this.state.notificationList.concat(item),
+    })
+  }
+
+  removeNotification = (id) => {
+    this.setState({
+      notificationList: this.state.notificationList.filter(item => item.id !== id),
+    })
+  }
+
+  displayNotification = (payload) => {
+    const id = (notificationId += 1)
+    const isString = typeof payload === 'string'
+    const text = isString ? payload : payload.text
+    const duration = isString ? 5000 : payload.duration || 5000
+
+    this.addNotification({
+      id,
+      text,
+    })
+
+    setTimeout(() => {
+      this.removeNotification(id)
+    }, duration)
   }
 
   resetGameState = () => {
     this.setState({
       ...INITIAL_STATE,
     })
-    clearTimeout(this.timeout)
-    clearInterval(this.countdown)
   }
 
   startLookingForRoom = () => {
@@ -162,14 +183,12 @@ class App extends React.Component {
 
   playChosenCards = () => {
     if (!this.state.chosenCards.length) {
-      alert('please choose cards to play!')
+      alert('請先選擇卡牌！')
       return
     }
 
     this.socket.emit('play_cards', this.state.chosenCards, () => {
-      this.setState({ chosenCards: [], pastTime: 0 })
-      clearTimeout(this.timeout)
-      clearInterval(this.countdown)
+      this.setState({ chosenCards: [] })
     })
   }
 
@@ -186,9 +205,7 @@ class App extends React.Component {
 
   playPass = () => {
     this.socket.emit('play_cards', [], () => {
-      this.setState({ chosenCards: [], pastTime: 0 })
-      clearTimeout(this.timeout)
-      clearInterval(this.countdown)
+      this.setState({ chosenCards: [] })
     })
   }
 
@@ -197,6 +214,7 @@ class App extends React.Component {
   }
 
   leaveRoom = () => {
+    console.log('leave')
     this.socket.emit('leave_room', () => {
       this.resetGameState()
     })
@@ -209,7 +227,7 @@ class App extends React.Component {
   }
 
   renderActionBar = () => {
-    const { meta, side, chosenCards, pastTime } = this.state
+    const { meta, side, chosenCards } = this.state
     return (
       <div>
         {meta.turn === side ? (
@@ -223,7 +241,6 @@ class App extends React.Component {
             <Button small onClick={this.resetChosenCards} disabled={!chosenCards.length}>
               重置
             </Button>
-            <Muted small>剩餘時間：{(TIMEOUT - pastTime) / 1000}</Muted>
           </React.Fragment>
         ) : (
           <Button small onClick={this.rushPlayer}>
@@ -235,11 +252,13 @@ class App extends React.Component {
   }
 
   render() {
-    const { isConnected, side, roomId, meta, chosenCards, won, gameFinished, rush } = this.state
+    const { isConnected, side, roomId, meta, chosenCards, won, gameFinished, rush, clientCount, notificationList } = this.state
     const opponentSide = side === 'A' ? 'B' : 'A'
     return (
       <Container>
         {isConnected || <LoadingOverlay text="連線到伺服器中" />}
+
+        <NotificationList notificationList={notificationList} removeNotification={this.removeNotification} />
 
         <Spring
           from={{ scale: 0 }}
@@ -290,7 +309,11 @@ class App extends React.Component {
                   justifyContent: 'flex-end',
                 }}
               >
-                <Muted small>房間ID: {roomId}</Muted>
+                <Info small>
+                  房間ID：{roomId}
+                  <br />
+                  在線玩家：{clientCount}
+                </Info>
                 <Button small onClick={this.onLeaveRoomClick}>
                   離開房間
                 </Button>
