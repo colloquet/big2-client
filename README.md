@@ -1,7 +1,5 @@
 # 鋤DEE A/B 網上對戰 Client (by [Coke_Zero](http://colloque.io/))
 
-> LIHKG Web client built with Vue.js
-
 [Live Demo](https://dee.colloque.io/)
 
 ## Build Setup
