@@ -2,27 +2,20 @@ import React from 'react'
 import Confetti from 'react-confetti'
 import styled from 'styled-components'
 import io from 'socket.io-client'
-import { Spring } from 'react-spring'
 
-import NotificationList from './components/NotificationList'
 import Spinner from './components/Spinner'
 import LoadingOverlay from './components/LoadingOverlay'
 import SidePicker from './components/SidePicker'
 import NamePicker from './components/NamePicker'
-import Card from './components/Card'
 import Button from './components/Button'
 import Muted from './components/Muted'
+import Rusher from './components/Rusher'
+import GameBoard from './components/GameBoard'
 
 const Container = styled.div`
   max-width: 960px;
   margin: 0 auto;
   padding: 1rem 1rem 5rem;
-`
-
-const CardsContainer = styled.div`
-  display: inline-block;
-  padding-left: 50px;
-  margin: 1rem 0;
 `
 
 const Modal = styled.div`
@@ -38,11 +31,38 @@ const Modal = styled.div`
   z-index: 999;
 `
 
+const Header = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+`
+
 const Info = Muted.extend`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 0.6rem;
+`
+
+const LoadingBlock = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 200px;
+`
+
+const ActionBar = styled.div`
+  @media (max-width: 480px) {
+    position: fixed;
+    box-shadow: 0 -2px 6px 0 rgba(0, 0, 0, 0.05);
+    background: #fff;
+    bottom: 0;
+    left: 0;
+    padding: 0.5rem;
+    width: 100%;
+    z-index: 996;
+  }
 `
 
 const INITIAL_STATE = {
@@ -58,8 +78,6 @@ const INITIAL_STATE = {
 function getRandomFromArray(array) {
   return array[Math.floor(Math.random() * array.length)]
 }
-
-let notificationId = 0
 
 class App extends React.Component {
   state = {
@@ -79,8 +97,8 @@ class App extends React.Component {
   }
 
   init = () => {
-    console.log('init')
     this.setState({ isConnected: true })
+
     this.socket.on('disconnect', this.resetGameState)
     this.socket.on('client_count', clientCount => {
       this.setState({ clientCount })
@@ -89,7 +107,7 @@ class App extends React.Component {
       console.log(`${playerId} has joined the room`)
     })
     this.socket.on('player_left', () => {
-      this.displayNotification('對方已離開房間')
+      this.props.displayNotification('對方已離開房間')
       this.leaveRoom()
     })
     this.socket.on('game_start', meta => {
@@ -99,7 +117,7 @@ class App extends React.Component {
       this.setState({ meta })
     })
     this.socket.on('game_error', message => {
-      this.displayNotification(message)
+      this.props.displayNotification(message)
     })
     this.socket.on('game_finish', winner => {
       const won = this.state.side === winner.side
@@ -114,34 +132,6 @@ class App extends React.Component {
         }, 1000)
       })
     })
-  }
-
-  addNotification = (item) => {
-    this.setState({
-      notificationList: this.state.notificationList.concat(item),
-    })
-  }
-
-  removeNotification = (id) => {
-    this.setState({
-      notificationList: this.state.notificationList.filter(item => item.id !== id),
-    })
-  }
-
-  displayNotification = (payload) => {
-    const id = (notificationId += 1)
-    const isString = typeof payload === 'string'
-    const text = isString ? payload : payload.text
-    const duration = isString ? 5000 : payload.duration || 5000
-
-    this.addNotification({
-      id,
-      text,
-    })
-
-    setTimeout(() => {
-      this.removeNotification(id)
-    }, duration)
   }
 
   resetGameState = () => {
@@ -214,7 +204,6 @@ class App extends React.Component {
   }
 
   leaveRoom = () => {
-    console.log('leave')
     this.socket.emit('leave_room', () => {
       this.resetGameState()
     })
@@ -229,7 +218,7 @@ class App extends React.Component {
   renderActionBar = () => {
     const { meta, side, chosenCards } = this.state
     return (
-      <div>
+      <ActionBar>
         {meta.turn === side ? (
           <React.Fragment>
             <Button small onClick={this.playPass} disabled={!meta.lastPlayedCards.length}>
@@ -247,42 +236,19 @@ class App extends React.Component {
             快D啦
           </Button>
         )}
-      </div>
+      </ActionBar>
     )
   }
 
   render() {
-    const { isConnected, side, roomId, meta, chosenCards, won, gameFinished, rush, clientCount, notificationList } = this.state
+    const { isConnected, side, roomId, meta, chosenCards, won, gameFinished, rush, clientCount } = this.state
     const opponentSide = side === 'A' ? 'B' : 'A'
+
     return (
       <Container>
         {isConnected || <LoadingOverlay text="連線到伺服器中" />}
 
-        <NotificationList notificationList={notificationList} removeNotification={this.removeNotification} />
-
-        <Spring
-          from={{ scale: 0 }}
-          to={{
-            scale: rush ? 1 : 0,
-          }}
-        >
-          {({ scale }) => (
-            <div
-              style={{
-                position: 'fixed',
-                top: '50%',
-                left: '50%',
-                transform: `translate(-50%, -50%) scale(${scale})`,
-                fontSize: '3rem',
-                zIndex: 997,
-              }}
-            >
-              <span role="img" aria-label="quick la">
-                🖕快D啦
-              </span>
-            </div>
-          )}
-        </Spring>
+        <Rusher active={rush} />
 
         {won && (
           <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 998 }}>
@@ -302,13 +268,7 @@ class App extends React.Component {
         {side && roomId ? (
           <div>
             {roomId && (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-end',
-                }}
-              >
+              <Header>
                 <Info small>
                   房間ID：{roomId}
                   <br />
@@ -317,73 +277,22 @@ class App extends React.Component {
                 <Button small onClick={this.onLeaveRoomClick}>
                   離開房間
                 </Button>
-              </div>
+              </Header>
             )}
             {meta ? (
-              <div>
-                <div style={{ marginTop: '1rem' }}>
-                  <Muted>對手 ({meta.members[opponentSide]})</Muted>
-                  <div>
-                    <CardsContainer>
-                      {meta.cards[opponentSide].map((card, index) => (
-                        <Card key={`${card.number}-${card.suit}`} card={card} index={index} />
-                      ))}
-                    </CardsContainer>
-                  </div>
-                </div>
-
-                <div style={{ padding: '1rem', background: '#f5f7f9', borderRadius: '8px' }}>
-                  <strong>出牌記錄</strong>
-                  {meta.history.length ? (
-                    <div>
-                      {meta.history.map((playedCards, index) => (
-                        <CardsContainer key={index} style={{ marginRight: '1rem' }}>
-                          {!!playedCards.length
-                            ? playedCards.map((card, index) => (
-                                <Card key={`${card.number}-${card.suit}`} card={card} index={index} />
-                              ))
-                            : !!meta.turnCount && <Card key="pass" isPass />}
-                        </CardsContainer>
-                      ))}
-                    </div>
-                  ) : (
-                    <Muted> - 暫無歷史</Muted>
-                  )}
-                </div>
-
-                {side === meta.turn && <h1>到你啦！</h1>}
-
-                <div style={{ marginTop: '1rem' }}>
-                  <Muted>自己 ({meta.members[side]})</Muted>
-                  <div>
-                    <CardsContainer>
-                      {meta.cards[side].map((card, index) => (
-                        <Card
-                          key={`${card.number}-${card.suit}`}
-                          card={card}
-                          onClick={this.chooseCard}
-                          isChosen={chosenCards.includes(card)}
-                          index={index}
-                        />
-                      ))}
-                    </CardsContainer>
-                  </div>
-                  {this.renderActionBar()}
-                </div>
-              </div>
+              <GameBoard
+                meta={meta}
+                mySide={side}
+                opponentSide={opponentSide}
+                chosenCards={chosenCards}
+                onCardClick={this.chooseCard}
+                renderActionBar={this.renderActionBar}
+              />
             ) : (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexDirection: 'column',
-                  minHeight: '200px',
-                }}
-              >
+              <LoadingBlock>
                 <Spinner style={{ marginBottom: '1rem' }} />
                 等待對手中...
-              </div>
+              </LoadingBlock>
             )}
           </div>
         ) : (

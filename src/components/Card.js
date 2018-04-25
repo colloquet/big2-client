@@ -12,7 +12,7 @@ const Container = styled.div`
   height: 120px;
   margin-left: -50px;
   color: ${props => getColor(props.suit)};
-  cursor: ${props => props.onClick ? 'pointer' : 'auto'};
+  cursor: ${props => (props.onClick ? 'pointer' : 'auto')};
 `
 
 const Meta = styled.div`

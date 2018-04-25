@@ -23,22 +23,22 @@ const Item = styled.li`
   }
 `
 
-function NotificationList({ notificationList, removeNotification }) {
+function NotificationList({ list, onDismiss }) {
   return ReactDOM.createPortal(
     <List>
       <Transition
-        keys={notificationList.map(item => item.id)}
+        keys={list.map(item => item.id)}
         from={{ opacity: 0, x: 100 }}
         enter={{ opacity: 1, x: 0 }}
         leave={{ opacity: 0, x: 100 }}
       >
-        {notificationList.map(item => ({ opacity, x }) => (
+        {list.map(item => ({ opacity, x }) => (
           <Item
             style={{
               opacity,
               transform: `translate3d(${x}%, 0, 0)`,
             }}
-            onClick={() => removeNotification(item.id)}
+            onClick={() => onDismiss(item.id)}
           >
             {item.text}
           </Item>

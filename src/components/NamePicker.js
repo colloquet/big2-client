@@ -33,7 +33,7 @@ class NamePicker extends React.Component {
     name: store.get('name') || '',
   }
 
-  onNameChange = (event) => {
+  onNameChange = event => {
     this.setState({ name: event.target.value })
   }
 
