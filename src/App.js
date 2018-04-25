@@ -173,9 +173,13 @@ class App extends React.Component {
     })
   }
 
-  startLookingForRoom = () => {
+  startLookingForRoom = (captchaResponse, errorCallback) => {
     const { side, name } = this.state
-    this.socket.emit('choose_side', { side, name }, roomId => {
+    this.socket.emit('choose_side', { side, name, captchaResponse }, (err, roomId) => {
+      if (err) {
+        errorCallback()
+        return
+      }
       this.setState({ roomId })
     })
   }
@@ -185,8 +189,8 @@ class App extends React.Component {
     this.setState({ side: playerSide })
   }
 
-  pickName = name => {
-    this.setState({ name }, this.startLookingForRoom)
+  pickName = (name, captchaResponse, errorCallback) => {
+    this.setState({ name }, () => this.startLookingForRoom(captchaResponse, errorCallback))
   }
 
   chooseCard = card => {

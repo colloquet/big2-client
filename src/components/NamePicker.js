@@ -1,7 +1,9 @@
 import React from 'react'
+import Recaptcha from 'react-recaptcha'
 import styled from 'styled-components'
 import store from 'store'
 
+import Spinner from './Spinner'
 import Button from './Button'
 
 const Container = styled.div`
@@ -31,13 +33,19 @@ const Input = styled.input`
 class NamePicker extends React.Component {
   state = {
     name: store.get('name') || '',
+    isLoading: true,
   }
 
   onNameChange = event => {
     this.setState({ name: event.target.value })
   }
 
-  onSubmit = () => {
+  onSubmit = (response) => {
+    this.setState({ isLoading: true })
+    this.recaptcha.execute()
+  }
+
+  verifyCaptcha = response => {
     if (!this.state.name.trim()) {
       alert('名稱不能為空白')
       return
@@ -47,21 +55,40 @@ class NamePicker extends React.Component {
       alert('名稱不能多過 20 個字')
       return
     }
-
+    
     store.set('name', this.state.name)
-    this.props.onPick(this.state.name)
+    this.props.onPick(this.state.name, response, this.onError)
+  }
+
+  onError = () => {
+    this.setState({ isLoading: false })
   }
 
   render() {
-    const { name } = this.state
+    const { name, isLoading } = this.state
     const { onBack } = this.props
     return (
-      <Container>
-        請輸入名稱
-        <Input type="text" value={name} onChange={this.onNameChange} placeholder="名稱" />
-        <Button onClick={this.onSubmit}>確定</Button>
-        <Button onClick={onBack}>返回</Button>
-      </Container>
+      <React.Fragment>
+        <Container>
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            <React.Fragment>
+              請輸入名稱
+              <Input type="text" value={name} onChange={this.onNameChange} placeholder="名稱" />
+              <Button onClick={this.onSubmit}>確定</Button>
+              <Button onClick={onBack}>返回</Button>
+            </React.Fragment>
+          )}
+        </Container>
+        <Recaptcha
+          ref={e => (this.recaptcha = e)}
+          sitekey="6LecdlUUAAAAAASEwZyngHOfp9Ayc63XsYT8fSDg"
+          size="invisible"
+          onloadCallback={() => this.setState({ isLoading: false })}
+          verifyCallback={this.verifyCaptcha}
+        />
+      </React.Fragment>
     )
   }
 }
