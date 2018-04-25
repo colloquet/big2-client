@@ -11,6 +11,7 @@ import Button from './components/Button'
 import Muted from './components/Muted'
 import Rusher from './components/Rusher'
 import GameBoard from './components/GameBoard'
+import github from './assets/images/github.svg'
 
 const Container = styled.div`
   max-width: 960px;
@@ -38,10 +39,12 @@ const Header = styled.div`
 `
 
 const Info = Muted.extend`
+  display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 0.6rem;
+  margin-right: 0.5rem;
 `
 
 const LoadingBlock = styled.div`
@@ -50,6 +53,24 @@ const LoadingBlock = styled.div`
   justify-content: center;
   flex-direction: column;
   min-height: 200px;
+`
+
+const IconLink = styled.a`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #f5f7f9;
+  box-shadow: 0 3px 0 0 #ccd1d7;
+  border-radius: 50%;
+  height: 2rem;
+  width: 2rem;
+  margin-right: 0.5rem;
+
+  > img {
+    width: 18px;
+    height: 18px;
+  }
 `
 
 const ActionBar = styled.div`
@@ -286,7 +307,10 @@ class App extends React.Component {
                   <br />
                   在線玩家：{clientCount}
                 </Info>
-                <Button small onClick={this.onLeaveRoomClick}>
+                <IconLink href="https://github.com/colloquet/big2-client" target="_blank" rel="noopener noreferrer">
+                  <img style={{ display: 'block' }} src={github} alt="GitHub" />
+                </IconLink>
+                <Button small style={{ margin: 0 }} onClick={this.onLeaveRoomClick}>
                   離開房間
                 </Button>
               </Header>
