@@ -11,7 +11,7 @@ class NotificationProvider extends React.Component {
 
   addNotification = item => {
     this.setState({
-      list: this.state.list.concat(item),
+      list: [item, ...this.state.list],
     })
   }
 

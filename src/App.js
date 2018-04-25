@@ -93,45 +93,57 @@ class App extends React.Component {
     } else {
       this.socket = io.connect('http://localhost:8080')
     }
-    this.socket.on('connect', this.init)
+    this.socket.on('connect', () => {
+      if (!this.initialized) {
+        this.init()
+      }
+    })
   }
 
   init = () => {
     this.setState({ isConnected: true })
 
-    this.socket.on('disconnect', this.resetGameState)
-    this.socket.on('client_count', clientCount => {
-      this.setState({ clientCount })
-    })
-    this.socket.on('player_joined', playerId => {
-      console.log(`${playerId} has joined the room`)
-    })
-    this.socket.on('player_left', () => {
-      this.props.displayNotification('對方已離開房間')
-      this.leaveRoom()
-    })
-    this.socket.on('game_start', meta => {
-      this.setState({ meta })
-    })
-    this.socket.on('game_update', meta => {
-      this.setState({ meta })
-    })
-    this.socket.on('game_error', message => {
-      this.props.displayNotification(message)
-    })
-    this.socket.on('game_finish', winner => {
-      const won = this.state.side === winner.side
-      this.setState({ won, gameFinished: true })
-    })
-    this.socket.on('rush_player', () => {
-      clearTimeout(this.rushTimeout)
-      this.setState({ rush: false }, () => {
-        this.setState({ rush: true })
-        this.rushTimeout = setTimeout(() => {
-          this.setState({ rush: false })
-        }, 1000)
+    this.socket
+      .on('disconnect', () => {
+        this.props.displayNotification('線已斷')
+        this.resetGameState()
       })
-    })
+      .on('reconnect', () => {
+        this.props.displayNotification('已重新連線')
+      })
+      .on('client_count', clientCount => {
+        this.setState({ clientCount })
+      })
+      .on('player_joined', playerId => {
+        console.log(`${playerId} has joined the room`)
+      })
+      .on('player_left', () => {
+        this.props.displayNotification('對方已離開房間')
+        this.leaveRoom()
+      })
+      .on('game_start', meta => {
+        this.setState({ meta })
+      })
+      .on('game_update', meta => {
+        this.setState({ meta })
+      })
+      .on('game_error', message => {
+        this.props.displayNotification(message)
+      })
+      .on('game_finish', winner => {
+        const won = this.state.side === winner.side
+        this.setState({ won, gameFinished: true })
+      })
+      .on('rush_player', () => {
+        clearTimeout(this.rushTimeout)
+        this.setState({ rush: false }, () => {
+          this.setState({ rush: true })
+          this.rushTimeout = setTimeout(() => {
+            this.setState({ rush: false })
+          }, 1000)
+        })
+      })
+    this.initialized = true
   }
 
   resetGameState = () => {
