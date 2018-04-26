@@ -302,7 +302,7 @@ class App extends React.Component {
 
     return (
       <Container>
-        {/* {isConnected || <LoadingOverlay text="連線到伺服器中" />} */}
+        {isConnected || <LoadingOverlay text="連線到伺服器中" />}
 
         <Rusher active={rush} />
 
