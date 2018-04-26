@@ -8,5 +8,6 @@ import './index.css'
 ReactDOM.render(
   <NotificationProvider>
     <App />
-  </NotificationProvider>
-, document.getElementById('root'))
+  </NotificationProvider>,
+  document.getElementById('root'),
+)

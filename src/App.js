@@ -96,15 +96,10 @@ const INITIAL_STATE = {
   rush: false,
 }
 
-function getRandomFromArray(array) {
-  return array[Math.floor(Math.random() * array.length)]
-}
-
 class App extends React.Component {
   state = {
     clientCount: 0,
     isConnected: false,
-    notificationList: [],
     ...INITIAL_STATE,
   }
 
@@ -215,15 +210,8 @@ class App extends React.Component {
     }
 
     this.socket.emit('play_cards', this.state.chosenCards, () => {
-      this.setState({ chosenCards: [] })
+      this.resetChosenCards()
     })
-  }
-
-  playRandomCard = () => {
-    this.setState({ chosenCards: [] })
-    const randomCard = getRandomFromArray(this.state.meta.cards[this.state.side])
-    this.chooseCard(randomCard)
-    this.playChosenCards()
   }
 
   resetChosenCards = () => {
@@ -232,7 +220,7 @@ class App extends React.Component {
 
   playPass = () => {
     this.socket.emit('play_cards', [], () => {
-      this.setState({ chosenCards: [] })
+      this.resetChosenCards()
     })
   }
 
@@ -280,6 +268,11 @@ class App extends React.Component {
   render() {
     const { isConnected, side, roomId, meta, chosenCards, won, gameFinished, rush, clientCount } = this.state
     const opponentSide = side === 'A' ? 'B' : 'A'
+    const overlay = side ? (
+      <NamePicker onPick={this.pickName} onBack={() => this.setState({ side: null })} />
+    ) : (
+      <SidePicker onPick={this.pickSide} />
+    )
 
     return (
       <Container>
@@ -336,13 +329,7 @@ class App extends React.Component {
             )}
           </div>
         ) : (
-          <React.Fragment>
-            {side ? (
-              <NamePicker onPick={this.pickName} onBack={() => this.setState({ side: null })} />
-            ) : (
-              <SidePicker onPick={this.pickSide} />
-            )}
-          </React.Fragment>
+          overlay
         )}
       </Container>
     )
