@@ -5,6 +5,7 @@ import store from 'store'
 
 import Spinner from './Spinner'
 import Button from './Button'
+import Muted from './Muted'
 
 const Container = styled.div`
   position: fixed;
@@ -40,7 +41,7 @@ class NamePicker extends React.Component {
     this.setState({ name: event.target.value })
   }
 
-  onSubmit = (response) => {
+  onSubmit = response => {
     this.setState({ isLoading: true })
     this.recaptcha.execute()
   }
@@ -55,7 +56,7 @@ class NamePicker extends React.Component {
       alert('名稱不能多過 20 個字')
       return
     }
-    
+
     store.set('name', this.state.name)
     this.props.onPick(this.state.name, response, this.onError)
   }
@@ -66,7 +67,7 @@ class NamePicker extends React.Component {
 
   render() {
     const { name, isLoading } = this.state
-    const { onBack } = this.props
+    const { side, onBack, stats } = this.props
     return (
       <React.Fragment>
         <Container>
@@ -74,6 +75,17 @@ class NamePicker extends React.Component {
             <Spinner />
           ) : (
             <React.Fragment>
+              {side && (
+                <h3>
+                  你選擇了 {side}
+                  {stats[side] && (
+                    <Muted small>
+                      <br />
+                      {` (勝率：${stats[side]}％)`}
+                    </Muted>
+                  )}
+                </h3>
+              )}
               請輸入名稱
               <Input type="text" value={name} onChange={this.onNameChange} placeholder="名稱" />
               <Button onClick={this.onSubmit}>確定</Button>

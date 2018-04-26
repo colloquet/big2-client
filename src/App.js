@@ -100,6 +100,7 @@ class App extends React.Component {
   state = {
     clientCount: 0,
     isConnected: false,
+    stats: {},
     ...INITIAL_STATE,
   }
 
@@ -129,6 +130,9 @@ class App extends React.Component {
       })
       .on('client_count', clientCount => {
         this.setState({ clientCount })
+      })
+      .on('win_rate', stats => {
+        this.setState({ stats })
       })
       .on('player_joined', playerId => {
         console.log(`${playerId} has joined the room`)
@@ -266,12 +270,12 @@ class App extends React.Component {
   }
 
   render() {
-    const { isConnected, side, roomId, meta, chosenCards, won, gameFinished, rush, clientCount } = this.state
+    const { isConnected, side, roomId, meta, chosenCards, won, gameFinished, rush, clientCount, stats } = this.state
     const opponentSide = side === 'A' ? 'B' : 'A'
     const overlay = side ? (
-      <NamePicker onPick={this.pickName} onBack={() => this.setState({ side: null })} />
+      <NamePicker onPick={this.pickName} side={side} onBack={() => this.setState({ side: null })} stats={stats} />
     ) : (
-      <SidePicker onPick={this.pickSide} />
+      <SidePicker onPick={this.pickSide} stats={stats} />
     )
 
     return (
