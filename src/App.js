@@ -5,6 +5,7 @@ import io from 'socket.io-client'
 
 import Spinner from './components/Spinner'
 import LoadingOverlay from './components/LoadingOverlay'
+import ModePicker from './components/ModePicker'
 import SidePicker from './components/SidePicker'
 import NamePicker from './components/NamePicker'
 import Button from './components/Button'
@@ -87,6 +88,7 @@ const ActionBar = styled.div`
 `
 
 const INITIAL_STATE = {
+  mode: null,
   side: null,
   roomId: null,
   meta: null,
@@ -173,8 +175,8 @@ class App extends React.Component {
   }
 
   startLookingForRoom = (captchaResponse, errorCallback) => {
-    const { side, name } = this.state
-    this.socket.emit('choose_side', { side, name, captchaResponse }, (err, roomId) => {
+    const { mode, side, name } = this.state
+    this.socket.emit('choose_side', { side, name, captchaResponse, mode }, (err, roomId) => {
       if (err) {
         errorCallback()
         return
@@ -183,9 +185,12 @@ class App extends React.Component {
     })
   }
 
+  pickMode = mode => {
+    this.setState({ mode })
+  }
+
   pickSide = side => {
-    const playerSide = side === 'BOT' ? 'A' : side
-    this.setState({ side: playerSide })
+    this.setState({ side })
   }
 
   pickName = (name, captchaResponse, errorCallback) => {
@@ -270,17 +275,34 @@ class App extends React.Component {
   }
 
   render() {
-    const { isConnected, side, roomId, meta, chosenCards, won, gameFinished, rush, clientCount, stats } = this.state
+    const {
+      isConnected,
+      side,
+      roomId,
+      meta,
+      chosenCards,
+      won,
+      gameFinished,
+      rush,
+      clientCount,
+      stats,
+      mode,
+    } = this.state
+
     const opponentSide = side === 'A' ? 'B' : 'A'
-    const overlay = side ? (
-      <NamePicker onPick={this.pickName} side={side} onBack={() => this.setState({ side: null })} stats={stats} />
+    const overlay = mode ? (
+      side ? (
+        <NamePicker onPick={this.pickName} side={side} onBack={() => this.setState({ side: null })} stats={stats} />
+      ) : (
+        <SidePicker onPick={this.pickSide} onBack={() => this.setState({ mode: null })} stats={stats} />
+      )
     ) : (
-      <SidePicker onPick={this.pickSide} stats={stats} />
+      <ModePicker onPick={this.pickMode} />
     )
 
     return (
       <Container>
-        {isConnected || <LoadingOverlay text="連線到伺服器中" />}
+        {/* {isConnected || <LoadingOverlay text="連線到伺服器中" />} */}
 
         <Rusher active={rush} />
 
@@ -299,7 +321,7 @@ class App extends React.Component {
           </Modal>
         )}
 
-        {side && roomId ? (
+        {mode && side && roomId ? (
           <div>
             {roomId && (
               <Header>

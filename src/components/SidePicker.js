@@ -17,7 +17,7 @@ const Container = styled.div`
   left: 0;
 `
 
-function SidePicker({ onPick, stats }) {
+function SidePicker({ onPick, onBack, stats }) {
   return (
     <Container>
       <span>請選擇位置</span>
@@ -39,6 +39,7 @@ function SidePicker({ onPick, stats }) {
           </Muted>
         )}
       </Button>
+      <Button onClick={onBack}>返回</Button>
     </Container>
   )
 }
