@@ -82,6 +82,8 @@ const ActionBar = styled.div`
     bottom: 0;
     left: 0;
     padding: 0.5rem;
+    padding-bottom: calc(0.5rem + constant(safe-area-inset-bottom));
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
     width: 100%;
     z-index: 996;
   }
