@@ -100,6 +100,8 @@ const INITIAL_STATE = {
   rush: false,
 }
 
+const isProd = process.env.NODE_ENV === 'production'
+
 class App extends React.Component {
   state = {
     clientCount: 0,
@@ -109,11 +111,8 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    if (process.env.NODE_ENV === 'production') {
-      this.socket = io.connect('https://dee.ireserve.me')
-    } else {
-      this.socket = io.connect('http://localhost:8080')
-    }
+    const url = isProd ? 'https://dee-api.colloque.io' : 'http://localhost:8080'
+    this.socket = io.connect(url)
     this.socket.on('connect', () => {
       if (!this.initialized) {
         this.init()
@@ -200,27 +199,29 @@ class App extends React.Component {
   }
 
   chooseCard = card => {
-    const isMyTurn = this.state.side === this.state.meta.turn
+    const { side, meta, chosenCards } = this.state
+    const isMyTurn = side === meta.turn
     if (!isMyTurn) return
 
-    const isBelongToPlayer = this.state.meta.cards[this.state.side].includes(card)
+    const isBelongToPlayer = meta.cards[side].includes(card)
     if (!isBelongToPlayer) return
 
-    const chosen = this.state.chosenCards.includes(card)
+    const chosen = chosenCards.includes(card)
     this.setState({
       chosenCards: chosen
-        ? this.state.chosenCards.filter(_card => _card !== card)
-        : this.state.chosenCards.concat(card),
+        ? chosenCards.filter(_card => _card !== card)
+        : chosenCards.concat(card),
     })
   }
 
   playChosenCards = () => {
-    if (!this.state.chosenCards.length) {
+    const { chosenCards } = this.state
+    if (!chosenCards.length) {
       alert('請先選擇卡牌！')
       return
     }
 
-    this.socket.emit('play_cards', this.state.chosenCards, () => {
+    this.socket.emit('play_cards', chosenCards, () => {
       this.resetChosenCards()
     })
   }
