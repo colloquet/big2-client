@@ -2,6 +2,8 @@
 
 [Live Demo](https://dee.colloque.io/)
 
+Server source: https://github.com/colloquet/big2-server
+
 ## Build Setup
 
 ``` bash
