@@ -3,22 +3,10 @@ import Recaptcha from 'react-recaptcha'
 import styled from 'styled-components'
 import store from 'store'
 
+import Modal from './Modal'
 import Spinner from './Spinner'
 import Button from './Button'
 import Muted from './Muted'
-
-const Container = styled.div`
-  position: fixed;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-`
 
 const Input = styled.input`
   height: 3rem;
@@ -67,10 +55,10 @@ class NamePicker extends React.Component {
 
   render() {
     const { name, isLoading } = this.state
-    const { side, onBack, stats } = this.props
+    const { side, onBack, stats, mode } = this.props
     return (
       <React.Fragment>
-        <Container>
+        <Modal>
           {isLoading ? (
             <Spinner />
           ) : (
@@ -78,10 +66,10 @@ class NamePicker extends React.Component {
               {side && (
                 <h3>
                   你選擇了 {side}
-                  {stats[side] && (
+                  {stats[mode][side] && (
                     <Muted small>
                       <br />
-                      {` (勝率：${stats[side]}％)`}
+                      {` (勝率：${stats[mode][side]}％)`}
                     </Muted>
                   )}
                 </h3>
@@ -92,7 +80,7 @@ class NamePicker extends React.Component {
               <Button onClick={onBack}>返回</Button>
             </React.Fragment>
           )}
-        </Container>
+        </Modal>
         <Recaptcha
           ref={e => (this.recaptcha = e)}
           sitekey="6LecdlUUAAAAAASEwZyngHOfp9Ayc63XsYT8fSDg"

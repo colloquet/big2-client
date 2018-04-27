@@ -1,46 +1,33 @@
 import React from 'react'
-import styled from 'styled-components'
 
+import Modal from './Modal'
 import Button from './Button'
 import Muted from './Muted'
 
-const Container = styled.div`
-  position: fixed;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-`
-
-function SidePicker({ onPick, onBack, stats }) {
+function SidePicker({ onPick, onBack, stats, mode }) {
   return (
-    <Container>
+    <Modal>
       <span>請選擇位置</span>
       <Button onClick={() => onPick('A')}>
         A
-        {stats.A && (
+        {stats[mode] && stats[mode].A && (
           <Muted small>
             <br />
-            {` (勝率：${stats.A}％)`}
+            {` (勝率：${stats[mode].A}％)`}
           </Muted>
         )}
       </Button>
       <Button onClick={() => onPick('B')}>
         B
-        {stats.B && (
+        {stats[mode] && stats[mode].B && (
           <Muted small>
             <br />
-            {` (勝率：${stats.B}％)`}
+            {` (勝率：${stats[mode].B}％)`}
           </Muted>
         )}
       </Button>
       <Button onClick={onBack}>返回</Button>
-    </Container>
+    </Modal>
   )
 }
 

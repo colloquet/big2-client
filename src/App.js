@@ -3,6 +3,7 @@ import Confetti from 'react-confetti'
 import styled from 'styled-components'
 import io from 'socket.io-client'
 
+import Modal from './components/Modal'
 import Spinner from './components/Spinner'
 import LoadingOverlay from './components/LoadingOverlay'
 import ModePicker from './components/ModePicker'
@@ -18,19 +19,6 @@ const Container = styled.div`
   max-width: 960px;
   margin: 0 auto;
   padding: 1rem 1rem 5rem;
-`
-
-const Modal = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: fixed;
-  background: rgba(255, 255, 255, 0.7);
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 999;
 `
 
 const Header = styled.div`
@@ -208,9 +196,7 @@ class App extends React.Component {
 
     const chosen = chosenCards.includes(card)
     this.setState({
-      chosenCards: chosen
-        ? chosenCards.filter(_card => _card !== card)
-        : chosenCards.concat(card),
+      chosenCards: chosen ? chosenCards.filter(_card => _card !== card) : chosenCards.concat(card),
     })
   }
 
@@ -295,9 +281,15 @@ class App extends React.Component {
     const opponentSide = side === 'A' ? 'B' : 'A'
     const overlay = mode ? (
       side ? (
-        <NamePicker onPick={this.pickName} side={side} onBack={() => this.setState({ side: null })} stats={stats} />
+        <NamePicker
+          onPick={this.pickName}
+          mode={mode}
+          side={side}
+          onBack={() => this.setState({ side: null })}
+          stats={stats}
+        />
       ) : (
-        <SidePicker onPick={this.pickSide} onBack={() => this.setState({ mode: null })} stats={stats} />
+        <SidePicker onPick={this.pickSide} mode={mode} onBack={() => this.setState({ mode: null })} stats={stats} />
       )
     ) : (
       <ModePicker onPick={this.pickMode} />
@@ -316,7 +308,7 @@ class App extends React.Component {
         )}
 
         {gameFinished && (
-          <Modal>
+          <Modal style={{ background: 'rgba(255, 255, 255, 0.7)' }}>
             <div style={{ textAlign: 'center' }}>
               <h1>{won ? 'You win!' : 'You lose!'}</h1>
               <Button onClick={this.leaveRoom}>離開房間</Button>
