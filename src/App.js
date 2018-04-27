@@ -111,7 +111,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    const url = isProd ? 'https://dee-api.colloque.io' : 'http://localhost:8080'
+    const url = isProd ? 'https://dee.ireserve.me' : 'http://localhost:8080'
     this.socket = io.connect(url)
     this.socket.on('connect', () => {
       if (!this.initialized) {
