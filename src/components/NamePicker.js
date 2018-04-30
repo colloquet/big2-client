@@ -66,7 +66,7 @@ class NamePicker extends React.Component {
               {side && (
                 <h3>
                   你選擇了 {side}
-                  {stats[mode][side] && (
+                  {stats[mode] && stats[mode][side] && (
                     <Muted small>
                       <br />
                       {` (勝率：${stats[mode][side]}％)`}
