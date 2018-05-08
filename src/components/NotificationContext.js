@@ -1,10 +1,10 @@
 import React from 'react'
 
-import NotificationList from './components/NotificationList'
-
 let notificationId = 0
 
-class NotificationProvider extends React.Component {
+const NotificationContext = React.createContext()
+
+export class NotificationProvider extends React.Component {
   state = {
     list: [],
   }
@@ -38,18 +38,27 @@ class NotificationProvider extends React.Component {
   }
 
   render() {
-    const { list } = this.state
-    const { children } = this.props
-
     return (
-      <React.Fragment>
-        <NotificationList list={list} onDismiss={this.removeNotification} />
-        {React.cloneElement(children, {
+      <NotificationContext.Provider
+        value={{
+          state: this.state,
+          removeNotification: this.removeNotification,
           displayNotification: this.displayNotification,
-        })}
-      </React.Fragment>
+        }}
+      >
+        {this.props.children}
+      </NotificationContext.Provider>
     )
+
+    // return (
+    //   <React.Fragment>
+    //     <NotificationList list={list} onDismiss={this.removeNotification} />
+    //     {React.cloneElement(children, {
+    //       displayNotification: this.displayNotification,
+    //     })}
+    //   </React.Fragment>
+    // )
   }
 }
 
-export default NotificationProvider
+export const NotificationConsumer = NotificationContext.Consumer

@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom'
 import { Transition } from 'react-spring'
 import styled from 'styled-components'
 
+import withNotification from './withNotification'
+
 const List = styled.ul`
   position: fixed;
   list-style: none;
@@ -23,22 +25,22 @@ const Item = styled.li`
   }
 `
 
-function NotificationList({ list, onDismiss }) {
+function NotificationList({ notificationList, removeNotification }) {
   return ReactDOM.createPortal(
     <List>
       <Transition
-        keys={list.map(item => item.id)}
+        keys={notificationList.map(item => item.id)}
         from={{ opacity: 0, x: 100 }}
         enter={{ opacity: 1, x: 0 }}
         leave={{ opacity: 0, x: 100 }}
       >
-        {list.map(item => ({ opacity, x }) => (
+        {notificationList.map(item => ({ opacity, x }) => (
           <Item
             style={{
               opacity,
               transform: `translate3d(${x}%, 0, 0)`,
             }}
-            onClick={() => onDismiss(item.id)}
+            onClick={() => removeNotification(item.id)}
           >
             {item.text}
           </Item>
@@ -49,4 +51,4 @@ function NotificationList({ list, onDismiss }) {
   )
 }
 
-export default NotificationList
+export default withNotification(NotificationList)

@@ -3,6 +3,7 @@ import Confetti from 'react-confetti'
 import styled from 'styled-components'
 import io from 'socket.io-client'
 
+import withNotification from './components/withNotification'
 import Modal from './components/Modal'
 import Spinner from './components/Spinner'
 import LoadingOverlay from './components/LoadingOverlay'
@@ -357,4 +358,4 @@ class App extends React.Component {
   }
 }
 
-export default App
+export default withNotification(App)
