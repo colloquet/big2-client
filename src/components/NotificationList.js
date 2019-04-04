@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Transition } from 'react-spring'
+import { Transition } from 'react-spring/renderprops'
 import styled from 'styled-components'
 
 import withNotification from './withNotification'
@@ -29,12 +29,13 @@ function NotificationList({ notificationList, removeNotification }) {
   return ReactDOM.createPortal(
     <List>
       <Transition
-        keys={notificationList.map(item => item.id)}
+        items={notificationList}
+        keys={item => item.id}
         from={{ opacity: 0, x: 100 }}
         enter={{ opacity: 1, x: 0 }}
         leave={{ opacity: 0, x: 100 }}
       >
-        {notificationList.map(item => ({ opacity, x }) => (
+        {item => ({ opacity, x }) => (
           <Item
             style={{
               opacity,
@@ -44,7 +45,7 @@ function NotificationList({ notificationList, removeNotification }) {
           >
             {item.text}
           </Item>
-        ))}
+        )}
       </Transition>
     </List>,
     document.body,

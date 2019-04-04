@@ -24,14 +24,14 @@ function ModePicker({ onPick, stats }) {
       <Button onClick={() => onPick(1)} style={{ padding: '0.5rem' }}>
         <Image src={mode1Thumbnail} alt="Mode 1" />
       </Button>
-      <a href={mode1} target="_blank">
+      <a href={mode1} target="_blank" rel="noopener noreferrer">
         <Muted>原圖</Muted>
       </a>
 
       <Button onClick={() => onPick(2)} style={{ marginTop: '2rem', padding: '0.5rem' }}>
         <Image src={mode2Thumbnail} alt="Mode 2" />
       </Button>
-      <a href={mode2} target="_blank">
+      <a href={mode2} target="_blank" rel="noopener noreferrer">
         <Muted>原圖</Muted>
       </a>
     </Modal>

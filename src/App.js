@@ -28,7 +28,7 @@ const Header = styled.div`
   justify-content: flex-end;
 `
 
-const Info = Muted.extend`
+const Info = styled(Muted)`
   display: block;
   white-space: nowrap;
   overflow: hidden;
