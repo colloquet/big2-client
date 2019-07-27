@@ -8,13 +8,13 @@ Server source: https://github.com/colloquet/big2-server
 
 ``` bash
 # install dependencies
-npm install
+yarn install
 
 # serve
-npm start
+yarn start
 
 # build for production with minification
-npm run build
+yarn run build
 ```
 
 ## License

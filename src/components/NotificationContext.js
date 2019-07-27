@@ -49,15 +49,6 @@ export class NotificationProvider extends React.Component {
         {this.props.children}
       </NotificationContext.Provider>
     );
-
-    // return (
-    //   <React.Fragment>
-    //     <NotificationList list={list} onDismiss={this.removeNotification} />
-    //     {React.cloneElement(children, {
-    //       displayNotification: this.displayNotification,
-    //     })}
-    //   </React.Fragment>
-    // )
   }
 }
 
