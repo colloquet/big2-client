@@ -1,20 +1,20 @@
-import React from 'react'
-import styled from 'styled-components'
+import React from 'react';
+import styled from 'styled-components';
 
-import Modal from './Modal'
-import Button from './Button'
-import Muted from './Muted'
+import Modal from './Modal';
+import Button from './Button';
+import Muted from './Muted';
 
-import mode1 from '../assets/images/mode-1.jpg'
-import mode1Thumbnail from '../assets/images/mode-1-thumbnail.jpg'
-import mode2 from '../assets/images/mode-2.jpg'
-import mode2Thumbnail from '../assets/images/mode-2-thumbnail.jpg'
+import mode1 from '../assets/images/mode-1.jpg';
+import mode1Thumbnail from '../assets/images/mode-1-thumbnail.jpg';
+import mode2 from '../assets/images/mode-2.jpg';
+import mode2Thumbnail from '../assets/images/mode-2-thumbnail.jpg';
 
 const Image = styled.img`
   display: block;
   border-radius: 6px;
   max-width: 200px;
-`
+`;
 
 function ModePicker({ onPick, stats }) {
   return (
@@ -35,7 +35,7 @@ function ModePicker({ onPick, stats }) {
         <Muted>原圖</Muted>
       </a>
     </Modal>
-  )
+  );
 }
 
-export default ModePicker
+export default ModePicker;

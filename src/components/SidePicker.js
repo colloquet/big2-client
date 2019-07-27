@@ -1,8 +1,8 @@
-import React from 'react'
+import React from 'react';
 
-import Modal from './Modal'
-import Button from './Button'
-import Muted from './Muted'
+import Modal from './Modal';
+import Button from './Button';
+import Muted from './Muted';
 
 function SidePicker({ onPick, onBack, stats, mode }) {
   return (
@@ -28,7 +28,7 @@ function SidePicker({ onPick, onBack, stats, mode }) {
       </Button>
       <Button onClick={onBack}>返回</Button>
     </Modal>
-  )
+  );
 }
 
-export default SidePicker
+export default SidePicker;

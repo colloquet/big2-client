@@ -1,5 +1,5 @@
-import React from 'react'
-import styled from 'styled-components'
+import React from 'react';
+import styled from 'styled-components';
 
 const Container = styled.div`
   display: inline-block;
@@ -13,7 +13,8 @@ const Container = styled.div`
   margin-left: -50px;
   color: ${props => getColor(props.suit)};
   cursor: ${props => (props.onClick ? 'pointer' : 'auto')};
-`
+  user-select: none;
+`;
 
 const Meta = styled.div`
   display: flex;
@@ -22,18 +23,18 @@ const Meta = styled.div`
   position: absolute;
   top: 0.5rem;
   left: 0.5rem;
-`
+`;
 
 const Suit = styled.span`
   font-size: 0.8rem;
-`
+`;
 
 const Pass = styled.strong`
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-`
+`;
 
 function getCardNumber(number) {
   return {
@@ -50,7 +51,7 @@ function getCardNumber(number) {
     11: 'J',
     12: 'Q',
     13: 'K',
-  }[number]
+  }[number];
 }
 
 function getCardSuit(suit) {
@@ -59,15 +60,15 @@ function getCardSuit(suit) {
     2: '♣',
     3: '♥',
     4: '♠',
-  }[suit]
+  }[suit];
 }
 
 function getColor(suit) {
-  return suit % 2 === 0 ? 'inherit' : '#bd081c'
+  return suit % 2 === 0 ? 'inherit' : '#bd081c';
 }
 
 function Card({ card, onClick, isChosen, index, isPass }) {
-  const chosenStyle = isChosen ? { transform: 'translateY(-1rem)' } : {}
+  const chosenStyle = isChosen ? { transform: 'translateY(-1rem)' } : {};
   return (
     <Container
       suit={card.suit}
@@ -86,7 +87,7 @@ function Card({ card, onClick, isChosen, index, isPass }) {
         </Meta>
       )}
     </Container>
-  )
+  );
 }
 
 Card.defaultProps = {
@@ -96,6 +97,6 @@ Card.defaultProps = {
   index: 1,
   isChosen: false,
   isPass: false,
-}
+};
 
-export default Card
+export default Card;

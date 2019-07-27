@@ -1,12 +1,12 @@
-import React from 'react'
-import Recaptcha from 'react-recaptcha'
-import styled from 'styled-components'
-import store from 'store'
+import React from 'react';
+import Recaptcha from 'react-recaptcha';
+import styled from 'styled-components';
+import store from 'store';
 
-import Modal from './Modal'
-import Spinner from './Spinner'
-import Button from './Button'
-import Muted from './Muted'
+import Modal from './Modal';
+import Spinner from './Spinner';
+import Button from './Button';
+import Muted from './Muted';
 
 const Input = styled.input`
   height: 3rem;
@@ -17,45 +17,45 @@ const Input = styled.input`
   font-size: 1rem;
   padding: 0.5rem;
   margin: 0.5rem;
-`
+`;
 
 class NamePicker extends React.Component {
   state = {
     name: store.get('name') || '',
     isLoading: true,
-  }
+  };
 
   onNameChange = event => {
-    this.setState({ name: event.target.value })
-  }
+    this.setState({ name: event.target.value });
+  };
 
   onSubmit = response => {
-    this.setState({ isLoading: true })
-    this.recaptcha.execute()
-  }
+    this.setState({ isLoading: true });
+    this.recaptcha.execute();
+  };
 
   verifyCaptcha = response => {
     if (!this.state.name.trim()) {
-      alert('名稱不能為空白')
-      return
+      alert('名稱不能為空白');
+      return;
     }
 
     if (this.state.name.length > 20) {
-      alert('名稱不能多過 20 個字')
-      return
+      alert('名稱不能多過 20 個字');
+      return;
     }
 
-    store.set('name', this.state.name)
-    this.props.onPick(this.state.name, response, this.onError)
-  }
+    store.set('name', this.state.name);
+    this.props.onPick(this.state.name, response, this.onError);
+  };
 
   onError = () => {
-    this.setState({ isLoading: false })
-  }
+    this.setState({ isLoading: false });
+  };
 
   render() {
-    const { name, isLoading } = this.state
-    const { side, onBack, stats, mode } = this.props
+    const { name, isLoading } = this.state;
+    const { side, onBack, stats, mode } = this.props;
     return (
       <React.Fragment>
         <Modal>
@@ -89,8 +89,8 @@ class NamePicker extends React.Component {
           verifyCallback={this.verifyCaptcha}
         />
       </React.Fragment>
-    )
+    );
   }
 }
 
-export default NamePicker
+export default NamePicker;

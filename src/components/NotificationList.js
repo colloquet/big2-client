@@ -1,9 +1,9 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
-import { Transition } from 'react-spring/renderprops'
-import styled from 'styled-components'
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Transition } from 'react-spring/renderprops';
+import styled from 'styled-components';
 
-import withNotification from './withNotification'
+import withNotification from './withNotification';
 
 const List = styled.ul`
   position: fixed;
@@ -12,7 +12,7 @@ const List = styled.ul`
   margin: 1rem;
   top: 0;
   right: 0;
-`
+`;
 
 const Item = styled.li`
   border-radius: 4px;
@@ -23,7 +23,7 @@ const Item = styled.li`
   & + & {
     margin-top: 0.5rem;
   }
-`
+`;
 
 function NotificationList({ notificationList, removeNotification }) {
   return ReactDOM.createPortal(
@@ -49,7 +49,7 @@ function NotificationList({ notificationList, removeNotification }) {
       </Transition>
     </List>,
     document.body,
-  )
+  );
 }
 
-export default withNotification(NotificationList)
+export default withNotification(NotificationList);

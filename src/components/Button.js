@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 const Button = styled.button`
   flex-shrink: 0;
@@ -22,6 +22,6 @@ const Button = styled.button`
   &:disabled {
     opacity: 0.6;
   }
-`
+`;
 
-export default Button
+export default Button;

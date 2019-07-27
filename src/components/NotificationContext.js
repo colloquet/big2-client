@@ -1,41 +1,41 @@
-import React from 'react'
+import React from 'react';
 
-let notificationId = 0
+let notificationId = 0;
 
-const NotificationContext = React.createContext()
+const NotificationContext = React.createContext();
 
 export class NotificationProvider extends React.Component {
   state = {
     list: [],
-  }
+  };
 
   addNotification = item => {
     this.setState({
       list: [item, ...this.state.list],
-    })
-  }
+    });
+  };
 
   removeNotification = id => {
     this.setState({
       list: this.state.list.filter(item => item.id !== id),
-    })
-  }
+    });
+  };
 
   displayNotification = payload => {
-    const id = (notificationId += 1)
-    const isString = typeof payload === 'string'
-    const text = isString ? payload : payload.text
-    const duration = isString ? 5000 : payload.duration || 5000
+    const id = (notificationId += 1);
+    const isString = typeof payload === 'string';
+    const text = isString ? payload : payload.text;
+    const duration = isString ? 5000 : payload.duration || 5000;
 
     this.addNotification({
       id,
       text,
-    })
+    });
 
     setTimeout(() => {
-      this.removeNotification(id)
-    }, duration)
-  }
+      this.removeNotification(id);
+    }, duration);
+  };
 
   render() {
     return (
@@ -48,7 +48,7 @@ export class NotificationProvider extends React.Component {
       >
         {this.props.children}
       </NotificationContext.Provider>
-    )
+    );
 
     // return (
     //   <React.Fragment>
@@ -61,4 +61,4 @@ export class NotificationProvider extends React.Component {
   }
 }
 
-export const NotificationConsumer = NotificationContext.Consumer
+export const NotificationConsumer = NotificationContext.Consumer;

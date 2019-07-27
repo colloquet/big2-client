@@ -1,6 +1,6 @@
-import React from 'react'
+import React from 'react';
 
-import { NotificationConsumer } from './NotificationContext'
+import { NotificationConsumer } from './NotificationContext';
 
 function withNotification(Component) {
   return function ThemedComponent(props) {
@@ -15,8 +15,8 @@ function withNotification(Component) {
           />
         )}
       </NotificationConsumer>
-    )
-  }
+    );
+  };
 }
 
-export default withNotification
+export default withNotification;

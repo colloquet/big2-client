@@ -1,6 +1,6 @@
-import React from 'react'
-import { Spring } from 'react-spring/renderprops'
-import styled from 'styled-components'
+import React from 'react';
+import { Spring } from 'react-spring/renderprops';
+import styled from 'styled-components';
 
 const Container = styled.div`
   position: fixed;
@@ -9,7 +9,7 @@ const Container = styled.div`
   font-size: 2.5rem;
   z-index: 997;
   pointer-events: none;
-`
+`;
 
 function Rusher({ active }) {
   return (
@@ -31,7 +31,7 @@ function Rusher({ active }) {
         </Container>
       )}
     </Spring>
-  )
+  );
 }
 
-export default Rusher
+export default Rusher;

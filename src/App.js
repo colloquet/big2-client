@@ -1,32 +1,32 @@
-import React from 'react'
-import Confetti from 'react-confetti'
-import styled from 'styled-components'
-import io from 'socket.io-client'
+import React from 'react';
+import Confetti from 'react-confetti';
+import styled from 'styled-components';
+import io from 'socket.io-client';
 
-import withNotification from './components/withNotification'
-import Modal from './components/Modal'
-import Spinner from './components/Spinner'
-import LoadingOverlay from './components/LoadingOverlay'
-import ModePicker from './components/ModePicker'
-import SidePicker from './components/SidePicker'
-import NamePicker from './components/NamePicker'
-import Button from './components/Button'
-import Muted from './components/Muted'
-import Rusher from './components/Rusher'
-import GameBoard from './components/GameBoard'
-import github from './assets/images/github.svg'
+import withNotification from './components/withNotification';
+import Modal from './components/Modal';
+import Spinner from './components/Spinner';
+import LoadingOverlay from './components/LoadingOverlay';
+import ModePicker from './components/ModePicker';
+import SidePicker from './components/SidePicker';
+import NamePicker from './components/NamePicker';
+import Button from './components/Button';
+import Muted from './components/Muted';
+import Rusher from './components/Rusher';
+import GameBoard from './components/GameBoard';
+import github from './assets/images/github.svg';
 
 const Container = styled.div`
   max-width: 960px;
   margin: 0 auto;
   padding: 1rem 1rem 5rem;
-`
+`;
 
 const Header = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-`
+`;
 
 const Info = styled(Muted)`
   display: block;
@@ -35,7 +35,7 @@ const Info = styled(Muted)`
   text-overflow: ellipsis;
   font-size: 0.6rem;
   margin-right: 0.5rem;
-`
+`;
 
 const LoadingBlock = styled.div`
   display: flex;
@@ -43,7 +43,7 @@ const LoadingBlock = styled.div`
   justify-content: center;
   flex-direction: column;
   min-height: 200px;
-`
+`;
 
 const IconLink = styled.a`
   display: flex;
@@ -61,7 +61,7 @@ const IconLink = styled.a`
     width: 18px;
     height: 18px;
   }
-`
+`;
 
 const ActionBar = styled.div`
   @media (max-width: 480px) {
@@ -76,7 +76,7 @@ const ActionBar = styled.div`
     width: 100%;
     z-index: 996;
   }
-`
+`;
 
 const INITIAL_STATE = {
   mode: null,
@@ -87,9 +87,9 @@ const INITIAL_STATE = {
   won: false,
   gameFinished: false,
   rush: false,
-}
+};
 
-const isProd = process.env.NODE_ENV === 'production'
+const isProd = process.env.NODE_ENV === 'production';
 
 class App extends React.Component {
   state = {
@@ -97,150 +97,150 @@ class App extends React.Component {
     isConnected: false,
     stats: {},
     ...INITIAL_STATE,
-  }
+  };
 
   componentDidMount() {
-    const url = isProd ? 'https://dee-api.colloque.io' : 'http://localhost:8080'
-    this.socket = io.connect(url)
+    const url = isProd ? 'https://dee-api.colloque.io' : 'http://localhost:8080';
+    this.socket = io.connect(url);
     this.socket.on('connect', () => {
       if (!this.initialized) {
-        this.init()
+        this.init();
       }
-    })
+    });
   }
 
   init = () => {
-    this.setState({ isConnected: true })
+    this.setState({ isConnected: true });
 
     this.socket
       .on('disconnect', () => {
-        this.props.displayNotification('線已斷')
-        this.resetGameState()
+        this.props.displayNotification('線已斷');
+        this.resetGameState();
       })
       .on('reconnect', () => {
-        this.props.displayNotification('已重新連線')
+        this.props.displayNotification('已重新連線');
       })
       .on('client_count', clientCount => {
-        this.setState({ clientCount })
+        this.setState({ clientCount });
       })
       .on('win_rate', stats => {
-        this.setState({ stats })
+        this.setState({ stats });
       })
       .on('player_joined', playerId => {
-        console.log(`${playerId} has joined the room`)
+        console.log(`${playerId} has joined the room`);
       })
       .on('player_left', () => {
-        this.props.displayNotification('對方已離開房間')
-        this.leaveRoom()
+        this.props.displayNotification('對方已離開房間');
+        this.leaveRoom();
       })
       .on('game_start', meta => {
-        this.setState({ meta })
+        this.setState({ meta });
       })
       .on('game_update', meta => {
-        this.setState({ meta })
+        this.setState({ meta });
       })
       .on('game_error', message => {
-        this.props.displayNotification(message)
+        this.props.displayNotification(message);
       })
       .on('game_finish', winner => {
-        const won = this.state.side === winner.side
-        this.setState({ won, gameFinished: true })
+        const won = this.state.side === winner.side;
+        this.setState({ won, gameFinished: true });
       })
       .on('rush_player', () => {
-        clearTimeout(this.rushTimeout)
+        clearTimeout(this.rushTimeout);
         this.setState({ rush: false }, () => {
-          this.setState({ rush: true })
+          this.setState({ rush: true });
           this.rushTimeout = setTimeout(() => {
-            this.setState({ rush: false })
-          }, 1000)
-        })
-      })
-    this.initialized = true
-  }
+            this.setState({ rush: false });
+          }, 1000);
+        });
+      });
+    this.initialized = true;
+  };
 
   resetGameState = () => {
     this.setState({
       ...INITIAL_STATE,
-    })
-  }
+    });
+  };
 
   startLookingForRoom = (captchaResponse, errorCallback) => {
-    const { mode, side, name } = this.state
+    const { mode, side, name } = this.state;
     this.socket.emit('choose_side', { side, name, captchaResponse, mode }, (err, roomId) => {
       if (err) {
-        errorCallback()
-        return
+        errorCallback();
+        return;
       }
-      this.setState({ roomId })
-    })
-  }
+      this.setState({ roomId });
+    });
+  };
 
   pickMode = mode => {
-    this.setState({ mode })
-  }
+    this.setState({ mode });
+  };
 
   pickSide = side => {
-    this.setState({ side })
-  }
+    this.setState({ side });
+  };
 
   pickName = (name, captchaResponse, errorCallback) => {
-    this.setState({ name }, () => this.startLookingForRoom(captchaResponse, errorCallback))
-  }
+    this.setState({ name }, () => this.startLookingForRoom(captchaResponse, errorCallback));
+  };
 
   chooseCard = card => {
-    const { side, meta, chosenCards } = this.state
-    const isMyTurn = side === meta.turn
-    if (!isMyTurn) return
+    const { side, meta, chosenCards } = this.state;
+    const isMyTurn = side === meta.turn;
+    if (!isMyTurn) return;
 
-    const isBelongToPlayer = meta.cards[side].includes(card)
-    if (!isBelongToPlayer) return
+    const isBelongToPlayer = meta.cards[side].includes(card);
+    if (!isBelongToPlayer) return;
 
-    const chosen = chosenCards.includes(card)
+    const chosen = chosenCards.includes(card);
     this.setState({
       chosenCards: chosen ? chosenCards.filter(_card => _card !== card) : chosenCards.concat(card),
-    })
-  }
+    });
+  };
 
   playChosenCards = () => {
-    const { chosenCards } = this.state
+    const { chosenCards } = this.state;
     if (!chosenCards.length) {
-      alert('請先選擇卡牌！')
-      return
+      alert('請先選擇卡牌！');
+      return;
     }
 
     this.socket.emit('play_cards', chosenCards, () => {
-      this.resetChosenCards()
-    })
-  }
+      this.resetChosenCards();
+    });
+  };
 
   resetChosenCards = () => {
-    this.setState({ chosenCards: [] })
-  }
+    this.setState({ chosenCards: [] });
+  };
 
   playPass = () => {
     this.socket.emit('play_cards', [], () => {
-      this.resetChosenCards()
-    })
-  }
+      this.resetChosenCards();
+    });
+  };
 
   rushPlayer = () => {
-    this.socket.emit('rush_player')
-  }
+    this.socket.emit('rush_player');
+  };
 
   leaveRoom = () => {
     this.socket.emit('leave_room', () => {
-      this.resetGameState()
-    })
-  }
+      this.resetGameState();
+    });
+  };
 
   onLeaveRoomClick = () => {
     if (window.confirm('確定要離開房間？')) {
-      this.leaveRoom()
+      this.leaveRoom();
     }
-  }
+  };
 
   renderActionBar = () => {
-    const { meta, side, chosenCards } = this.state
+    const { meta, side, chosenCards } = this.state;
     return (
       <ActionBar>
         {meta.turn === side ? (
@@ -261,8 +261,8 @@ class App extends React.Component {
           </Button>
         )}
       </ActionBar>
-    )
-  }
+    );
+  };
 
   render() {
     const {
@@ -277,9 +277,9 @@ class App extends React.Component {
       clientCount,
       stats,
       mode,
-    } = this.state
+    } = this.state;
 
-    const opponentSide = side === 'A' ? 'B' : 'A'
+    const opponentSide = side === 'A' ? 'B' : 'A';
     const overlay = mode ? (
       side ? (
         <NamePicker
@@ -294,7 +294,7 @@ class App extends React.Component {
       )
     ) : (
       <ModePicker onPick={this.pickMode} />
-    )
+    );
 
     return (
       <Container>
@@ -303,7 +303,17 @@ class App extends React.Component {
         <Rusher active={rush} />
 
         {won && (
-          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 998 }}>
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: 998,
+              pointerEvents: 'none',
+            }}
+          >
             <Confetti width={window.innerWidth} height={window.innerHeight} />
           </div>
         )}
@@ -354,8 +364,8 @@ class App extends React.Component {
           overlay
         )}
       </Container>
-    )
+    );
   }
 }
 
-export default withNotification(App)
+export default withNotification(App);
