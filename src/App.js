@@ -296,10 +296,12 @@ class App extends React.Component {
       <ModePicker onPick={this.pickMode} />
     );
 
+    if (!isConnected) {
+      return <LoadingOverlay text="連線到伺服器中" />;
+    }
+
     return (
       <Container>
-        {isConnected || <LoadingOverlay text="連線到伺服器中" />}
-
         <Rusher active={rush} />
 
         {won && (
