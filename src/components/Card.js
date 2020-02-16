@@ -14,6 +14,7 @@ const Container = styled.div`
   color: ${props => getColor(props.suit)};
   cursor: ${props => (props.onClick ? 'pointer' : 'auto')};
   user-select: none;
+  transition: transform 0.2s;
 `;
 
 const Meta = styled.div`

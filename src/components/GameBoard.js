@@ -57,7 +57,7 @@ function GameBoard({ meta, mySide, opponentSide, chosenCards, onCardClick, rende
         )}
       </HistoryContainer>
 
-      {myTurn && <h1>到你啦！</h1>}
+      {myTurn ? <h1>到你啦！</h1> : <h1>對手出牌中</h1>}
 
       <div style={{ marginTop: '1rem' }}>
         <Muted>自己 ({myName})</Muted>
